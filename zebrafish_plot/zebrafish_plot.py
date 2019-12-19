@@ -15,7 +15,7 @@ import matplotlib.pyplot as plt
 
 def import_csv(filepath):  # Imports array from csv
     """This function imports the .csv file into a numpy array"""
-    if ~ isinstance(filepath, str):  # Checks for string input
+    if not(isinstance(filepath, str)):  # Checks for string input
         print("Error: Invalid filepath type")
         return
 
