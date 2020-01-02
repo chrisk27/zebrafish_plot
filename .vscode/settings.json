@@ -1,4 +1,4 @@
 {
-    "python.pythonPath": "/home/chris/projects/zebrafish_plot/zp_venv/bin/python3.7"
+    "python.pythonPath": "zp_venv/bin/python"
     
 }

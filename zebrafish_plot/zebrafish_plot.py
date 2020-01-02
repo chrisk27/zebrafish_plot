@@ -8,55 +8,15 @@ Will later add in support for visualizing where the iridophores were located, ma
 """
 
 import numpy as np
-import os.path
-from os import path
+import os
 import matplotlib.pyplot as plt
 
-
-def import_csv(filepath):  # Imports array from csv
-    """This function imports the .csv file into a numpy array"""
-    if not(isinstance(filepath, str)):  # Checks for string input
-        print("Error: Invalid filepath type")
-        return
-
-    elif not(path.isfile(filepath)):  # Check if it's a file (will use different functions for animations)
-        print("Error: No such file exists")
-        return
-    
-    else:
-        return np.genfromtxt(filepath, delimiter = ',')
-
-
-def sim_to_plot(sim_array):
-    """This function outputs an array of the correct size to work with matplotlib.pyplot's imshow"""
-    twoDshape = sim_array.shape
-    imgDims = (twoDshape[0], twoDshape[1], 3)
-    return np.zeros(imgDims, dtype=np.float32)
-
-def simple_plotter(sim_array, plot_array):
-    """
-    This function fills the plot array with values (0-1) for the coloring of the different chromaphores.
-
-    For the simple case, the following is observed:
-        White pixels are empty nodes ('S' in original paper, 0 in sim_array)
-        Yellow pixels are xanthophores ('X' in original paper, 1 in sim_array)
-        Black pixels are melanophores ('M' in original paper, 2 in sim_array)
-    """
-    if (sim_array.shape[0] == plot_array.shape[0]) & (sim_array.shape[1] == plot_array.shape[1]):
-        plot_array[sim_array == 0, :] = [1, 1, 1]
-        plot_array[sim_array == 1, :] = [1, 1, 0]
-        plot_array[sim_array == 2, :] = [0, 0, 0]
-        return plot_array
-    else:
-        print("Error: plot and simulation dimensions do not match")
-        return
-
+from tools import importers, plotters
 
 if __name__ == '__main__':
-    filename = '/home/chris/projects/basedifgrow/tmpOutput.csv'
-    simulation = import_csv(filename)
-    base = sim_to_plot(simulation)
-    base_img = simple_plotter(simulation, base)
+    filename = '/home/chris/projects/growdifgrow/csvOutputs/img_0001.csv'
+    simulation = importers.import_csv(filename)
+    base_img = plotters.plot_to_size(simulation, (100, 100))
     plt.imshow(base_img)
     plt.show()
 
