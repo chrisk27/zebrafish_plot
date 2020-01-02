@@ -24,9 +24,10 @@ def import_csv(filepath):  # Imports array from csv
 def pull_images(basepath):  # Pulls a list of all file names that fit the criteria of "img_xxxx.csv"
     """This function outputs a list of the files we want to import from the directory 'basepath'"""
     file_list = []
-    for file_name in os.scandir(basepath):
-        if fnmatch.fnmatch(file_name, 'img_*.csv'):
+    for file_name in os.listdir(basepath):
+        if fnmatch.fnmatch(file_name, '*.csv'):
             file_list.append(file_name)
+    file_list.sort()
     return file_list
 
 

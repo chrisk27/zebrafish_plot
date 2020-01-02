@@ -14,11 +14,28 @@ import matplotlib.pyplot as plt
 from tools import importers, plotters
 
 if __name__ == '__main__':
-    filename = '/home/chris/projects/growdifgrow/csvOutputs/img_0001.csv'
-    simulation = importers.import_csv(filename)
-    base_img = plotters.plot_to_size(simulation, (100, 100))
-    plt.imshow(base_img)
+
+    # Get information for importing
+    basepath = '/home/chris/projects/growdifgrow/csvOutputs/'
+    img_list = importers.pull_images(basepath)
+    final_img = importers.import_csv(basepath + img_list[-1])
+    final_size = final_img.shape
+
+    # Create output directory
+    if not os.path.exists('/home/chris/projects/growdifgrow/csvOutputs/Images/'):
+        os.mkdir('/home/chris/projects/growdifgrow/csvOutputs/Images/')
+    
+    # Fill output directory with images
+    for item in img_list:
+        sim_array = importers.import_csv(basepath + item)
+        image = plotters.plot_to_size(sim_array, final_size)
+        save_name = item.replace('.csv', '.png')
+        save_name = '/home/chris/projects/growdifgrow/csvOutputs/Images/' + save_name
+        plt.imshow(image)
+        plt.savefig(save_name)
+        plt.clf()
     plt.show()
+
 
 
 
