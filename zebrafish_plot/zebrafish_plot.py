@@ -31,10 +31,20 @@ if __name__ == '__main__':
         image = plotters.plot_to_size(sim_array, final_size)
         save_name = item.replace('.csv', '.png')
         save_name = '/home/chris/projects/growdifgrow/csvOutputs/Images/' + save_name
-        plt.imshow(image)
-        plt.savefig(save_name)
-        plt.clf()
-    plt.show()
+        plt.figure()
+        plt.axes(frameon=False)
+        ax = plt.subplot(111)
+        ax.imshow(image)
+        ax.spines['right'].set_visible(False)
+        ax.spines['left'].set_visible(False)
+        ax.spines['top'].set_visible(False)
+        ax.spines['bottom'].set_visible(False)
+        ax.get_xaxis().set_visible(False)
+        ax.get_yaxis().set_visible(False)
+        ax.tick_params(bottom="off", left='off')
+        plt.savefig(save_name, bbox_inches='tight')
+        plt.close()
+
 
 
 

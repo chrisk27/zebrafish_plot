@@ -25,7 +25,7 @@ def pull_images(basepath):  # Pulls a list of all file names that fit the criter
     """This function outputs a list of the files we want to import from the directory 'basepath'"""
     file_list = []
     for file_name in os.listdir(basepath):
-        if fnmatch.fnmatch(file_name, '*.csv'):
+        if fnmatch.fnmatch(file_name, 'img*.csv'):
             file_list.append(file_name)
     file_list.sort()
     return file_list
