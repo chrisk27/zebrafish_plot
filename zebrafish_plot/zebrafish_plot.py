@@ -8,10 +8,11 @@ Will later add in support for visualizing where the iridophores were located, ma
 """
 
 import numpy as np
+import math
 import os
 import matplotlib.pyplot as plt
 
-from tools import importers, plotters
+from tools import importers, plotters, STPlotter
 
 if __name__ == '__main__':
 
@@ -21,13 +22,29 @@ if __name__ == '__main__':
     final_img = importers.import_csv(basepath + img_list[-1])
     final_size = final_img.shape
 
+    # Initialize ST plot
+    rowCutSize = final_size[1]
+    rowCutLoc = int(math.ceil(final_size[0] / 2))
+    colCounter = 0
+    space_time = STPlotter.stPlotEmptyTemplate(rdim = rowCutSize, cdim = len(img_list))
+
     # Create output directory
     if not os.path.exists('/home/chris/projects/growdifgrow/csvOutputs/Images/'):
         os.mkdir('/home/chris/projects/growdifgrow/csvOutputs/Images/')
     
     # Fill output directory with images
     for item in img_list:
+
+        # Import proper plot
         sim_array = importers.import_csv(basepath + item)
+        
+        # Add to Space-Time plot
+        cut = sim_array[rowCutLoc, :]
+        filledCut = STPlotter.fillSlice(cut, desired_size=rowCutSize)
+        space_time[:, colCounter] = filledCut
+        colCounter += 1
+
+        # Save as its own figure
         image = plotters.plot_to_size(sim_array, final_size)
         save_name = item.replace('.csv', '.png')
         save_name = '/home/chris/projects/growdifgrow/csvOutputs/Images/' + save_name
@@ -44,6 +61,22 @@ if __name__ == '__main__':
         ax.tick_params(bottom="off", left='off')
         plt.savefig(save_name, bbox_inches='tight')
         plt.close()
+
+    # Process ST plot
+    finalST = STPlotter.plotST(space_time)
+    STName = '/home/chris/projects/growdifgrow/csvOutputs/Images/SpaceTimePlot.png'
+    plt.figure()
+    plt.axes(frameon=False)
+    ax = plt.subplot(111)
+    ax.set_ylabel('Space')
+    ax.set_xlabel('Time')
+    ax.imshow(finalST)
+    plt.savefig(STName, bbox_inches='tight')
+    plt.show()
+
+        
+        
+        
 
 
 
