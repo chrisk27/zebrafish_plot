@@ -17,62 +17,80 @@ from tools import importers, plotters, STPlotter
 if __name__ == '__main__':
 
     # Get information for importing
-    basepath = '/home/chris/projects/growdifgrow/csvOutputs/'
-    img_list = importers.pull_images(basepath)
-    final_img = importers.import_csv(basepath + img_list[-1])
-    final_size = final_img.shape
+    sims2itOver = []  # Will store path to directories I need to plot in here
+    basepath = '/home/chris/projects/difgrow_mc_sims/'
+    datepath = '20_01_07/'  # For now I'll have to change this manually. Will iterate through each sim run per day though
+    dirPath = basepath + datepath
+    for item in os.listdir(dirPath):
+        fullSimPath = dirPath + item
+        if os.path.isdir(fullSimPath):
+            sims2itOver.append(fullSimPath + "/")
 
-    # Initialize ST plot
-    rowCutSize = final_size[1]
-    rowCutLoc = int(math.ceil(final_size[0] / 2))
-    colCounter = 0
-    space_time = STPlotter.stPlotEmptyTemplate(rdim = rowCutSize, cdim = len(img_list))
 
-    # Create output directory
-    if not os.path.exists('/home/chris/projects/growdifgrow/csvOutputs/Images/'):
-        os.mkdir('/home/chris/projects/growdifgrow/csvOutputs/Images/')
-    
-    # Fill output directory with images
-    for item in img_list:
+    # Loop over every simulation you want to analyze
+    for sim in sims2itOver:
 
-        # Import proper plot
-        sim_array = importers.import_csv(basepath + item)
+        img_list = importers.pull_images(sim)
+        final_img = importers.import_csv(sim + img_list[-1])
+        final_size = final_img.shape
+
+        # Initialize ST plot
+        rowCutSize = final_size[1]
+        rowCutLoc = int(math.ceil(final_size[0] / 2))
+        colCounter = 0
+        space_time = STPlotter.stPlotEmptyTemplate(rdim = rowCutSize, cdim = len(img_list))
+
+        # Create output directory
+        imgDir = sim + '/Images/'
+        if not os.path.exists(imgDir):
+            os.mkdir(imgDir)
         
-        # Add to Space-Time plot
-        cut = sim_array[rowCutLoc, :]
-        filledCut = STPlotter.fillSlice(cut, desired_size=rowCutSize)
-        space_time[:, colCounter] = filledCut
-        colCounter += 1
+        # Fill output directory with images
+        for item in img_list:
 
-        # Save as its own figure
-        image = plotters.plot_to_size(sim_array, final_size)
-        save_name = item.replace('.csv', '.png')
-        save_name = '/home/chris/projects/growdifgrow/csvOutputs/Images/' + save_name
+            # Import proper plot
+            sim_array = importers.import_csv(sim + item)
+            
+            # Add to Space-Time plot
+            if sim_array.ndim == 2:
+                cut = sim_array[rowCutLoc, :]
+            elif sim_array.ndim ==1:
+                cut = np.array([sim_array[rowCutLoc]])
+            else:
+                cut = np.array([0])
+            filledCut = STPlotter.fillSlice(cut, desired_size=rowCutSize)
+            space_time[:, colCounter] = filledCut
+            colCounter += 1
+
+            # Save as its own figure
+            image = plotters.plot_to_size(sim_array, final_size)
+            save_name = item.replace('.csv', '.png')
+            save_name = imgDir + save_name
+            plt.figure()
+            plt.axes(frameon=False)
+            ax = plt.subplot(111)
+            ax.imshow(image)
+            ax.spines['right'].set_visible(False)
+            ax.spines['left'].set_visible(False)
+            ax.spines['top'].set_visible(False)
+            ax.spines['bottom'].set_visible(False)
+            ax.get_xaxis().set_visible(False)
+            ax.get_yaxis().set_visible(False)
+            ax.tick_params(bottom="off", left='off')
+            plt.savefig(save_name, bbox_inches='tight')
+            plt.close()
+
+        # Process ST plot
+        finalST = STPlotter.plotST(space_time)
+        STName = imgDir + '/SpaceTimePlot.png'
         plt.figure()
         plt.axes(frameon=False)
         ax = plt.subplot(111)
-        ax.imshow(image)
-        ax.spines['right'].set_visible(False)
-        ax.spines['left'].set_visible(False)
-        ax.spines['top'].set_visible(False)
-        ax.spines['bottom'].set_visible(False)
-        ax.get_xaxis().set_visible(False)
-        ax.get_yaxis().set_visible(False)
-        ax.tick_params(bottom="off", left='off')
-        plt.savefig(save_name, bbox_inches='tight')
+        ax.set_ylabel('Space')
+        ax.set_xlabel('Time')
+        ax.imshow(finalST)
+        plt.savefig(STName, bbox_inches='tight')
         plt.close()
-
-    # Process ST plot
-    finalST = STPlotter.plotST(space_time)
-    STName = '/home/chris/projects/growdifgrow/csvOutputs/Images/SpaceTimePlot.png'
-    plt.figure()
-    plt.axes(frameon=False)
-    ax = plt.subplot(111)
-    ax.set_ylabel('Space')
-    ax.set_xlabel('Time')
-    ax.imshow(finalST)
-    plt.savefig(STName, bbox_inches='tight')
-    plt.show()
 
         
         

@@ -44,9 +44,25 @@ def plot_to_size(sim_array, final_size):
     plot_array = np.zeros((final_size[0], final_size[1], 3))
     plot_array[:, :, 2] = np.ones(final_size)  # makes everything blue (will overlay later)
     sim_size = sim_array.shape
-    if (final_size[0] < sim_size[0]) | (final_size[1] < sim_size[1]) :
+
+    if ((sim_array.ndim == 1) & (len(sim_array) <= final_size[0])) :  # If just a shorter vector
+        for i in range(len(sim_array)):
+            if sim_array[i] == 0:
+                plot_array[i, 0, :] = [1, 1, 1]
+            elif sim_array[i] == 1:
+                plot_array[i, 0, :] = [1, 1, 0]
+            elif sim_array[i] == 2:
+                plot_array[i, 0, :] = [0, 0, 0]
+        return plot_array
+
+    elif ((sim_array.ndim == 1) & (len(sim_array) > final_size[0])) :
         print("Error: wrong final dimension size chosen")
         return
+
+    elif (final_size[0] < sim_size[0]) | (final_size[1] < sim_size[1]) :
+        print("Error: wrong final dimension size chosen")
+        return
+
     else:
         for i in range(sim_size[0]):
             for j in range(sim_size[1]):

@@ -41,6 +41,10 @@ def fillSlice(cut, desired_size = None):
     """This function fills a slice of a matrix to an appropriate size, so it can be plugged into an ST plot"""
     if not desired_size:
         return cut
+    elif len(cut) == 1:
+        out = 10 * np.ones(desired_size)
+        out[0] = cut
+        return out
     elif len(cut) <= desired_size:
         out = 10 * np.ones(desired_size)
         out[0:len(cut)] = cut
