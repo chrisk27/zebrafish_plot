@@ -10,6 +10,7 @@ Will later add in support for visualizing where the iridophores were located, ma
 import numpy as np
 import math
 import os
+import imageio
 import matplotlib.pyplot as plt
 
 from tools import importers, plotters, STPlotter
@@ -19,7 +20,7 @@ if __name__ == '__main__':
     # Get information for importing
     sims2itOver = []  # Will store path to directories I need to plot in here
     basepath = '/home/chris/projects/difgrow_mc_sims/'
-    datepath = '20_01_07/'  # For now I'll have to change this manually. Will iterate through each sim run per day though
+    datepath = '20_01_25/'  # For now I'll have to change this manually. Will iterate through each sim run per day though
     dirPath = basepath + datepath
     for item in os.listdir(dirPath):
         fullSimPath = dirPath + item
@@ -43,6 +44,9 @@ if __name__ == '__main__':
             rowCutLoc = int(math.ceil(final_size[0] / 2))
             colCounter = 0
             space_time = STPlotter.stPlotEmptyTemplate(rdim = rowCutSize, cdim = len(img_list))
+
+            # Initialize animation
+            animatedList = []
 
             # Fill output directory with images
             for item in img_list:
@@ -79,6 +83,9 @@ if __name__ == '__main__':
                 plt.savefig(save_name, bbox_inches='tight')
                 plt.close()
 
+                # Add to list of images for animation
+                animatedList.append(imageio.imread(save_name))
+
             # Process ST plot
             finalST = STPlotter.plotST(space_time)
             STName = imgDir + '/SpaceTimePlot.png'
@@ -90,6 +97,10 @@ if __name__ == '__main__':
             ax.imshow(finalST)
             plt.savefig(STName, bbox_inches='tight')
             plt.close()
+
+            # Make animations
+            animName = imgDir + '/Animation.gif'
+            imageio.mimsave(animName, animatedList, fps = 50)
 
         
         
