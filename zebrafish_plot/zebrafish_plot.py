@@ -20,7 +20,7 @@ if __name__ == '__main__':
     # Get information for importing
     sims2itOver = []  # Will store path to directories I need to plot in here
     basepath = '/home/chris/projects/difgrow_mc_sims/'
-    datepath = '20_01_25/'  # For now I'll have to change this manually. Will iterate through each sim run per day though
+    datepath = '20_01_27/'  # For now I'll have to change this manually. Will iterate through each sim run per day though
     dirPath = basepath + datepath
     for item in os.listdir(dirPath):
         fullSimPath = dirPath + item
@@ -49,7 +49,7 @@ if __name__ == '__main__':
             animatedList = []
 
             # Fill output directory with images
-            for item in img_list:
+            for item in sorted(img_list):
 
                 # Import proper plot
                 sim_array = importers.import_csv(sim + item)
@@ -84,7 +84,7 @@ if __name__ == '__main__':
                 plt.close()
 
                 # Add to list of images for animation
-                animatedList.append(imageio.imread(save_name))
+                animatedList.append((image * 255).astype(np.uint8))  # Note: may have to go back to imageio.imread. I changed it to save time, but I'm not sure it'll order correctly
 
             # Process ST plot
             finalST = STPlotter.plotST(space_time)
