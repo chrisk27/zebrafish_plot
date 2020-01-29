@@ -18,7 +18,7 @@ if __name__ == '__main__':
     # Get information for importing
     sims2itOver = []  # Will store path to directories I need to plot in here
     basepath = '/home/chris/projects/difgrow_mc_sims/'
-    datepath = '20_01_25/'  # For now I'll have to change this manually. Will iterate through each sim run per day though
+    datepath = '20_01_21/'  # For now I'll have to change this manually. Will iterate through each sim run per day though
     dirPath = basepath + datepath
     for item in os.listdir(dirPath):
         fullSimPath = dirPath + item
@@ -28,17 +28,19 @@ if __name__ == '__main__':
     for sim in sims2itOver:
         
         # Check and then load Image directory
-        imgDir = sim + '/Images/'
+        imgDir = sim + 'Images/'
         if os.path.isdir(imgDir):
             animateList = []
 
             # Read in all of the images
             for img in sorted(os.listdir(imgDir)):
-                animateList.append(imageio.imread(img))
+                if (img.endswith('png') and not img.startswith('SpaceTimePlot')):
+                    imgPath = imgDir + img
+                    animateList.append(imageio.imread(imgPath))
             
             # Make and save animation
             animFile = imgDir + 'Animation.gif'
-            imageio.mimsave(animFile, animateList, fps = 50)
+            imageio.mimwrite(animFile, animateList, fps = 50)
         
         else:
             print("Failure: no image file exists. Use zebrafish_plot.py to create images")
