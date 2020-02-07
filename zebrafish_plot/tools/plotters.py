@@ -7,6 +7,7 @@ The more complex ones should be allowed for us to make animations.
 
 import numpy as np
 import matplotlib.pyplot as plt
+import math
 
 
 def sim_to_plot(sim_array):
@@ -45,7 +46,16 @@ def plot_to_size(sim_array, final_size):
     plot_array[:, :, 2] = np.ones(final_size)  # makes everything blue (will overlay later)
     sim_size = sim_array.shape
 
-    if ((sim_array.ndim == 1) & (len(sim_array) <= final_size[0])) :  # If just a shorter vector
+    if sim_array.ndim == 0 :  # If just one value
+        if sim_array == np.array(0):
+            plot_array[0, 0, :] = [1, 1, 1]
+        elif sim_array == np.array(1):
+            plot_array[0, 0, :] = [1, 1, 0]
+        elif sim_array == np.array(2):
+            plot_array[0, 0, :] = [0, 0, 0]
+        return plot_array
+    
+    elif ((sim_array.ndim == 1) & (len(sim_array) <= final_size[0])) :  # If just a shorter vector
         for i in range(len(sim_array)):
             if sim_array[i] == 0:
                 plot_array[i, 0, :] = [1, 1, 1]
@@ -54,6 +64,7 @@ def plot_to_size(sim_array, final_size):
             elif sim_array[i] == 2:
                 plot_array[i, 0, :] = [0, 0, 0]
         return plot_array
+  
 
     elif ((sim_array.ndim == 1) & (len(sim_array) > final_size[0])) :
         print("Error: wrong final dimension size chosen")
@@ -73,4 +84,72 @@ def plot_to_size(sim_array, final_size):
                 elif sim_array[i, j] == 2:
                     plot_array[i, j, :] = [0, 0, 0]
         return plot_array
+
+
+def plot_centering(sim_array, final_size):
+    """
+    This function will plot the sim_array into a matrix of size final_size. It will be plotted into the center of the final matrix.
+    Then, just as normal plotting, it will color the output matrix in accordance with the simple_plotter function.
+    sim_array should be a 2D array, and final_size should be a tuple. The output will be a 3D RGB array.
+    """
+
+    plot_array = np.zeros((final_size[0], final_size[1], 3))
+    plot_array[:, :, 2] = np.ones(final_size) # makes everything blue, will overlay later
+    sim_size = sim_array.shape
+    final_center = [np.floor((final_size[0] -1) / 2), np.floor((final_size[1] - 1) / 2)]
+    
+    #  Here is where we figure out the centering
+    if sim_array.ndim ==0:
+        row_shift = final_center[0]
+        col_shift = final_center[1]
+    elif len(sim_array.shape) == 1:  # If a 1D column
+        row_shift = final_center[0]
+        col_shift = final_center[1] - np.floor((sim_size[0] - 1) / 2)
+    elif sim_array.ndim == 2:  # If either a 1D row or a 2D array
+        row_shift = final_center[0] - np.floor((sim_array.shape[0] - 1) / 2)
+        col_shift = final_center[1] - np.floor((sim_array.shape[1] - 1) / 2)
+    else:
+        print("Error on sizing")
+        return
+    
+    #  Now, fill in the plot as needed
+    if sim_array.ndim == 0:
+        if sim_array == np.array(0):
+            plot_array[int(row_shift), int(col_shift), :] = [1, 1, 1]
+        elif sim_array == np.array(1):
+            plot_array[int(row_shift), int(col_shift), :] = [1, 1, 0]
+        elif sim_array == np.array(2):
+            plot_array[int(row_shift), int(col_shift), :] = [0, 0, 0]
+        return plot_array
+
+    elif ((sim_array.ndim == 1) & (len(sim_array) <= final_size[0])) :  # If just a shorter vector
+        for i in range(len(sim_array)):
+            if sim_array[i] == 0:
+                plot_array[int(i + row_shift), int(col_shift), :] = [1, 1, 1]
+            elif sim_array[i] == 1:
+                plot_array[int(i + row_shift), int(col_shift), :] = [1, 1, 0]
+            elif sim_array[i] == 2:
+                plot_array[int(i + row_shift), int(col_shift), :] = [0, 0, 0]
+        return plot_array
+    
+    elif ((sim_array.ndim == 1) & (len(sim_array) > final_size[0])) :
+        print("Error: wrong final dimension size chosen")
+        return
+
+    elif (final_size[0] < sim_size[0]) | (final_size[1] < sim_size[1]) :
+        print("Error: wrong final dimension size chosen")
+        return
+
+    else:
+        for i in range(sim_size[0]):
+            for j in range(sim_size[1]):
+                if sim_array[i, j] == 0:
+                    plot_array[int(i + row_shift), int(j + col_shift), :] = [1, 1, 1]
+                elif sim_array[i, j] == 1:
+                    plot_array[int(i + row_shift), int(j + col_shift), :] = [1, 1, 0]
+                elif sim_array[i, j] == 2:
+                    plot_array[int(i + row_shift), int(j + col_shift), :] = [0, 0, 0]
+        return plot_array
+    
+
 
