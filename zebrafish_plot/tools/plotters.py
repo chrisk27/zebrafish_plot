@@ -169,7 +169,7 @@ def plot_grow2D_right(sim_array, final_size):
     if sim_array.ndim ==0:
         row_shift = row_center
     elif len(sim_array.shape) == 1:  # If a 1D column
-        row_shift = row_center
+        row_shift = row_center - np.floor((sim_size[0] - 1) / 2)
     elif sim_array.ndim == 2:  # If either a 1D row or a 2D array
         row_shift = row_center - np.floor((sim_size[0] - 1) / 2)
     else:
@@ -213,4 +213,69 @@ def plot_grow2D_right(sim_array, final_size):
                     plot_array[int(i + row_shift), j, :] = [1, 1, 0]
                 elif sim_array[i, j] == 2:
                     plot_array[int(i + row_shift), j, :] = [0, 0, 0]
+        return plot_array
+
+
+def plot_grow2D_left(sim_array, final_size):
+    """
+    This function will plot the sim_array into a matrix of size final_size. It will be plotted into the center of the rows, but the right column will be
+    on the right of the domain, so it's always growing on one side. It's basically the other-side alternate to the above function.
+    Then, just as normal plotting, it will color the output matrix in accordance with the simple_plotter function.
+    sim_array should be a 2D array, and final_size should be a tuple. The output will be a 3D RGB array.
+    """
+
+    plot_array = np.zeros((final_size[0], final_size[1], 3))
+    plot_array[:, :, 2] = np.ones(final_size) # makes everything blue, will overlay later
+    sim_size = sim_array.shape
+    row_center = np.floor((final_size[0] -1) / 2)
+    
+    #  Here is where we figure out the centering
+    if sim_array.ndim ==0:
+        row_shift = row_center
+    elif len(sim_array.shape) == 1:  # If a 1D column
+        row_shift = row_center - np.floor((sim_size[0] -1) / 2)
+    elif sim_array.ndim == 2:  # If either a 1D row or a 2D array
+        row_shift = row_center - np.floor((sim_size[0] - 1) / 2)
+    else:
+        print("Error on sizing")
+        return
+
+    #  Now, fill in the plot as needed
+    if sim_array.ndim == 0:
+        if sim_array == np.array(0):
+            plot_array[int(row_shift), -1, :] = [1, 1, 1]
+        elif sim_array == np.array(1):
+            plot_array[int(row_shift), -1, :] = [1, 1, 0]
+        elif sim_array == np.array(2):
+            plot_array[int(row_shift), -1, :] = [0, 0, 0]
+        return plot_array
+
+    elif ((sim_array.ndim == 1) & (len(sim_array) <= final_size[0])) :  # If just a shorter vector
+        for i in range(len(sim_array)):
+            if sim_array[i] == 0:
+                plot_array[int(i + row_shift), -1, :] = [1, 1, 1]
+            elif sim_array[i] == 1:
+                plot_array[int(i + row_shift), -1, :] = [1, 1, 0]
+            elif sim_array[i] == 2:
+                plot_array[int(i + row_shift), -1, :] = [0, 0, 0]
+        return plot_array
+    
+    elif ((sim_array.ndim == 1) & (len(sim_array) > final_size[0])) :
+        print("Error: wrong final dimension size chosen")
+        return
+
+    elif (final_size[0] < sim_size[0]) | (final_size[1] < sim_size[1]) :
+        print("Error: wrong final dimension size chosen")
+        return
+
+    else:
+        offset = final_size[1] - sim_size[1]
+        for i in range(sim_size[0]):
+            for j in range(sim_size[1]):
+                if sim_array[i, j] == 0:
+                    plot_array[int(i + row_shift), offset + j, :] = [1, 1, 1]
+                elif sim_array[i, j] == 1:
+                    plot_array[int(i + row_shift), offset + j, :] = [1, 1, 0]
+                elif sim_array[i, j] == 2:
+                    plot_array[int(i + row_shift), offset + j, :] = [0, 0, 0]
         return plot_array
