@@ -18,10 +18,16 @@ from tools import importers, plotters, STPlotter
 if __name__ == '__main__':
 
     # Get information for importing
-    sims2itOver = []  # Will store path to directories I need to plot in here
-    basepath = '/home/chris/projects/Simulation Dump (Testing)/'
-    datepath = '20_02_06/'  # For now I'll have to change this manually. Will iterate through each sim run per day though
+    sims2itOver = []  # Will store path to directories you need to plot in here
+
+    ###########################################################################################################
+    # MUST UPDATE PATH TO SIMULATIONS TO RUN SCRIPT 
+    
+    basepath = '/home/chris/projects/difgrow_mc_sims/'
+    datepath = '20_09_23/'  # For now I'll have to change this manually. Will iterate through each sim run per day though
     dirPath = basepath + datepath
+    ###########################################################################################################
+
     for item in os.listdir(dirPath):
         fullSimPath = dirPath + item
         if os.path.isdir(fullSimPath):
@@ -39,6 +45,7 @@ if __name__ == '__main__':
             final_img = importers.import_csv(sim + img_list[-1])
             final_size = final_img.shape
 
+            # NOTE: Can uncomment below to form a space-time plot of the data. Read descritpions of functions before doing so
             # Initialize ST plot
 #            rowCutSize = final_size[1]
 #            rowCutLoc = int(math.ceil(final_size[0] / 2))
@@ -66,7 +73,7 @@ if __name__ == '__main__':
 #                colCounter += 1
 
                 # Save as its own figure
-                image = plotters.plot_centering(sim_array, final_size)
+                image = plotters.plot_grow2D_right(sim_array, final_size) # Change this function depending on how you wish to plot the images.
                 save_name = item.replace('.csv', '.png')
                 save_name = imgDir + save_name
                 plt.figure()
@@ -84,9 +91,8 @@ if __name__ == '__main__':
                 plt.close()
 
                 # Add to list of images for animation
-                animatedList.append((image * 255).astype(np.uint8))  # Note: may have to go back to imageio.imread. I changed it to save time, but I'm not sure it'll order correctly
+                animatedList.append((image * 255).astype(np.uint8))  
 
-            # Process ST plot
 #            finalST = STPlotter.plotST(space_time)
 #            STName = imgDir + '/SpaceTimePlot.png'
 #            plt.figure()
@@ -101,6 +107,9 @@ if __name__ == '__main__':
             # Make animations
             animName = imgDir + '/Animation.gif'
             imageio.mimsave(animName, animatedList, fps = 50)
+
+            print("Done")
+
 
         
         
