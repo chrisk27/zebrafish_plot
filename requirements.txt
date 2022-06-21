@@ -1,5 +1,5 @@
 pip == 19.3.1
 wheel == 0.33.6
-numpy == 1.17.4
+numpy == 1.22.0
 matplotib == 3.1.2
 imageio == 2.6.1
